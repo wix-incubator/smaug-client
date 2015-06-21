@@ -9,12 +9,9 @@ package com.wix.pay.creditcard.tokenizer.model
 
 import com.wix.pay.creditcard.PublicCreditCard
 
-import scala.beans.BeanProperty
-
 
 /** Container for a token and its associated Public Credit Card.
   *
   * @author <a href="mailto:ohadr@wix.com">Raz, Ohad</a>
   */
-case class CreditCardToken(@BeanProperty token: String,
-                           @BeanProperty creditCard: PublicCreditCard)
+case class CreditCardToken(token: String, creditCard: PublicCreditCard)
