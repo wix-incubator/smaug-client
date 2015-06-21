@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.wix.pay</groupId>
             <artifactId>credit-card</artifactId>
-            <version>${creditcard.version}</version>
+            <version>${com.wix.pay.creditcard.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
