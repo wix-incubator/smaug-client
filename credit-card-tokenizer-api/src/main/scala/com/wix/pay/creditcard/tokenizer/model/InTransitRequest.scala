@@ -14,6 +14,5 @@ import com.wix.pay.creditcard.CreditCardOptionalFields
   *
   * @author <a href="mailto:ohadr@wix.com">Raz, Ohad</a>
   */
-case class InTransitRequest(accessToken: String,
-                            permanentToken: CreditCardToken,
+case class InTransitRequest(permanentToken: CreditCardToken,
                             additionalInfo: Option[CreditCardOptionalFields] = None)
