@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix.pay</groupId>
-    <artifactId>credit-card-tokenizer-api</artifactId>
+    <artifactId>credit-card-tokenizer-client</artifactId>
     <version>1.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Credit Card Tokenizer API</name>
-    <description>Credit Card Tokenizer API</description>
+	<name>Credit Card Tokenizer Client</name>
+    <description>Credit Card Tokenizer Client</description>
 	
     <developers>
         <developer>
@@ -40,17 +40,24 @@
     </parent>
 
     <dependencies>
+        <!-- Compile/runtime dependencies -->
         <dependency>
             <groupId>com.wix.pay</groupId>
-            <artifactId>credit-card</artifactId>
-            <version>${com.wix.pay.creditcard.version}</version>
+            <artifactId>credit-card-tokenizer-common</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>util-core_${scala.dependencies.version}</artifactId>
-            <version>6.20.0</version>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+            <version>${com.google.http.client.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
+        <dependency>
+            <groupId>com.wix.pay</groupId>
+            <artifactId>credit-card-tokenizer-testkit</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
