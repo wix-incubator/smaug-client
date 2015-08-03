@@ -1,12 +1,12 @@
 package com.wix.pay.creditcard.tokenizer
 
 
+import scala.concurrent.duration.Duration
 import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
 import com.twitter.util.{Return, Throw, Try}
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, Error, Response, TokenizeRequest}
+import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, TokenizeRequest}
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
-
-import scala.concurrent.duration.Duration
+import com.wix.restaurants.common.protocol.api.{Error, Response}
 
 
 object Endpoints {

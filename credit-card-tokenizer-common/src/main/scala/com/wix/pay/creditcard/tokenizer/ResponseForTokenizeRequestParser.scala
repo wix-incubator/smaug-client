@@ -6,9 +6,12 @@
 \*                |/                                                 */
 package com.wix.pay.creditcard.tokenizer
 
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, Response}
+
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization
+import com.wix.pay.creditcard.tokenizer.model.CreditCardToken
+import com.wix.restaurants.common.protocol.api.Response
+
 
 class ResponseForTokenizeRequestParser {
   implicit val formats = DefaultFormats

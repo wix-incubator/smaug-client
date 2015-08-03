@@ -1,13 +1,16 @@
 package com.wix.pay.creditcard.tokenizer
 
-import com.wix.pay.creditcard.tokenizer.model.{Error, ErrorCodes}
+
+import com.wix.pay.creditcard.tokenizer.model.ErrorCodes
+import com.wix.restaurants.common.protocol.api.Error
+
 
 class ExceptionsTranslator {
   def translateError(error: Error): Throwable = {
     error.code match {
       case ErrorCodes.unauthorized => UnauthorizedException(error.description)
-      case ErrorCodes.internal => new TokenizerInternalException(error.description)
-      case _ => new TokenizerInternalException(error.description)
+      case ErrorCodes.internal => TokenizerInternalException(error.description)
+      case _ => TokenizerInternalException(error.description)
     }
   }
 

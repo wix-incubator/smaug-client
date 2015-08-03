@@ -1,10 +1,11 @@
 package com.wix.pay.creditcard.tokenizer.testkit
 
 
-import com.wix.hoopoe.http.testkit.EmbeddedHttpProbe
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, Error, Response, TokenizeRequest}
-import com.wix.pay.creditcard.tokenizer.{ResponseForTokenizeRequestParser, TokenizeRequestParser}
 import spray.http._
+import com.wix.hoopoe.http.testkit.EmbeddedHttpProbe
+import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, TokenizeRequest}
+import com.wix.pay.creditcard.tokenizer.{ResponseForTokenizeRequestParser, TokenizeRequestParser}
+import com.wix.restaurants.common.protocol.api.{Error, Response}
 
 
 class TokenizerDriver(port: Int) {
