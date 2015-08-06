@@ -10,7 +10,7 @@ import com.wix.restaurants.common.protocol.api.{Error, Response}
 
 
 object Endpoints {
-  val production = "https://pay.wix.com/tokenizer"
+  val production = "https://pay.wix.com/cards"
 }
 
 class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
