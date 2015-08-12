@@ -1,12 +1,13 @@
 package com.wix.pay.creditcard.tokenizer
 
 
-import scala.concurrent.duration.Duration
 import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
 import com.twitter.util.{Return, Throw, Try}
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, TokenizeRequest}
+import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
 import com.wix.restaurants.common.protocol.api.{Error, Response}
+
+import scala.concurrent.duration.Duration
 
 
 object Endpoints {
@@ -21,6 +22,8 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
                              accessToken: Option[String] = None) extends TokenizerClient {
   private val tokenizeRequestParser = new TokenizeRequestParser
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
+  private val inTransitRequestParser = new InTransitRequestParser
+  private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
 
   override def tokenize(card: CreditCard): Try[CreditCardToken] = {
@@ -45,7 +48,21 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   override def inTransit(permanentToken: CreditCardToken,
                          additionalInfo: Option[CreditCardOptionalFields] = None): Try[CreditCardToken] = {
     Try {
-      throw new UnsupportedOperationException("inTransit is not implemented")
+      val request = InTransitRequest(
+        permanentToken = permanentToken,
+        additionalInfo = additionalInfo
+      )
+      val requestJson = inTransitRequestParser.stringify(request)
+
+      val responseJson = doJsonRequest("/inTransit", requestJson)
+
+      responseForInTransitRequestParser.parse(responseJson)
+    } match {
+      case Return(response) => response match {
+        case ResponseHasError(error) => Throw(exceptionsTranslator.translateError(error))
+        case ResponseHasValue(value) => Return(value)
+      }
+      case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
     }
   }
 

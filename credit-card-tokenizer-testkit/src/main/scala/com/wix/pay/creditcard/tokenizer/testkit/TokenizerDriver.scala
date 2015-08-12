@@ -1,17 +1,19 @@
 package com.wix.pay.creditcard.tokenizer.testkit
 
 
-import spray.http._
 import com.wix.hoopoe.http.testkit.EmbeddedHttpProbe
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, TokenizeRequest}
-import com.wix.pay.creditcard.tokenizer.{ResponseForTokenizeRequestParser, TokenizeRequestParser}
+import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
+import com.wix.pay.creditcard.tokenizer.{InTransitRequestParser, ResponseForInTransitRequestParser, ResponseForTokenizeRequestParser, TokenizeRequestParser}
 import com.wix.restaurants.common.protocol.api.{Error, Response}
+import spray.http._
 
 
 class TokenizerDriver(port: Int) {
   private val probe = new EmbeddedHttpProbe(port, EmbeddedHttpProbe.NotFoundHandler)
   private val tokenizeRequestParser = new TokenizeRequestParser
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
+  private val inTransitRequestParser = new InTransitRequestParser
+  private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
 
   def start() {
     probe.doStart()
@@ -27,6 +29,10 @@ class TokenizerDriver(port: Int) {
 
   def aTokenizeFor(request: TokenizeRequest): TokenizeCtx = {
     new TokenizeCtx(request)
+  }
+
+  def anInTransitFor(request: InTransitRequest): InTransitCtx = {
+    new InTransitCtx(request)
   }
 
   abstract class Ctx(resource: String) {
@@ -63,4 +69,22 @@ class TokenizerDriver(port: Int) {
       parsedRequest == request
     }
   }
+
+  class InTransitCtx(request: InTransitRequest) extends Ctx("/inTransit") {
+    def returns(value: CreditCardToken): Unit = {
+      val response = Response[CreditCardToken](value = value)
+      returnsJson(responseForInTransitRequestParser.stringify(response))
+    }
+
+    def errors(error: Error): Unit = {
+      val response = Response[CreditCardToken](error = error)
+      returnsJson(responseForInTransitRequestParser.stringify(response))
+    }
+
+    protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
+      val parsedRequest = inTransitRequestParser.parse(entity.asString)
+      parsedRequest == request
+    }
+  }
+
 }
