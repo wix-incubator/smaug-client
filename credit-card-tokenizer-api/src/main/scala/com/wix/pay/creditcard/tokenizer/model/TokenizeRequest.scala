@@ -14,4 +14,4 @@ import com.wix.pay.creditcard.CreditCard
   *
   * @author <a href="mailto:ohadr@wix.com">Raz, Ohad</a>
   */
-case class TokenizeRequest(creditCard: CreditCard)
+case class TokenizeRequest(card: CreditCard)

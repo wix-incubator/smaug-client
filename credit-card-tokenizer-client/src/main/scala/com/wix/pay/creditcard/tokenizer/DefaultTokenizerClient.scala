@@ -26,7 +26,7 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   override def tokenize(card: CreditCard): Try[CreditCardToken] = {
     Try {
       val request = TokenizeRequest(
-        creditCard = card
+        card = card
       )
       val requestJson = tokenizeRequestParser.stringify(request)
 

@@ -1,16 +1,14 @@
 package com.wix.pay.creditcard.tokenizer
 
 
-import scala.reflect.ClassTag
-import org.specs2.matcher._
-import org.specs2.mutable.SpecWithJUnit
-import org.specs2.specification.Scope
 import com.google.api.client.http.javanet.NetHttpTransport
-import com.twitter.util.{Return, Throw, Try}
+import com.twitter.util.{Return, Throw}
 import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, ErrorCodes, TokenizeRequest}
 import com.wix.pay.creditcard.tokenizer.testkit.TokenizerDriver
 import com.wix.pay.creditcard.{CreditCard, PublicCreditCard, YearMonth}
 import com.wix.restaurants.common.protocol.api.Error
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.Scope
 
 
 class DefaultTokenizerClientTest extends SpecWithJUnit {
@@ -24,7 +22,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
   val someCardToken = CreditCardToken(
     token = "some token",
     creditCard = PublicCreditCard(someCard))
-  val aTokenizeRequest = TokenizeRequest(creditCard = someCard)
+  val aTokenizeRequest = TokenizeRequest(card = someCard)
   val tokenizer = new DefaultTokenizerClient(
     requestFactory = new NetHttpTransport().createRequestFactory(),
     endpointUrl = s"http://localhost:$tokenizerPort")
