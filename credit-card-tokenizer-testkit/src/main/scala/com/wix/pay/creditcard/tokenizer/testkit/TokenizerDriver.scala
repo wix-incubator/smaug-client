@@ -2,8 +2,8 @@ package com.wix.pay.creditcard.tokenizer.testkit
 
 
 import com.wix.hoopoe.http.testkit.EmbeddedHttpProbe
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
-import com.wix.pay.creditcard.tokenizer.{InTransitRequestParser, ResponseForInTransitRequestParser, ResponseForTokenizeRequestParser, TokenizeRequestParser}
+import com.wix.pay.creditcard.tokenizer._
+import com.wix.pay.creditcard.tokenizer.model._
 import com.wix.restaurants.common.protocol.api.{Error, Response}
 import spray.http._
 
@@ -14,6 +14,10 @@ class TokenizerDriver(port: Int) {
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
   private val inTransitRequestParser = new InTransitRequestParser
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
+  private val saveRequestParser = new SaveRequestParser
+  private val responseForSaveRequestParser = new ResponseForSaveRequestParser
+  private val deleteRequestParser = new DeleteRequestParser
+  private val responseForDeleteRequestParser = new ResponseForDeleteRequestParser
 
   def start() {
     probe.doStart()
@@ -33,6 +37,14 @@ class TokenizerDriver(port: Int) {
 
   def anInTransitFor(request: InTransitRequest): InTransitCtx = {
     new InTransitCtx(request)
+  }
+
+  def aSaveFor(request: SaveRequest): SaveCtx = {
+    new SaveCtx(request)
+  }
+
+  def aDeleteFor(request: DeleteRequest): DeleteCtx = {
+    new DeleteCtx(request)
   }
 
   abstract class Ctx(resource: String) {
@@ -87,4 +99,37 @@ class TokenizerDriver(port: Int) {
     }
   }
 
+  class SaveCtx(request: SaveRequest) extends Ctx("/save") {
+    def returns(value: CreditCardToken): Unit = {
+      val response = Response[CreditCardToken](value = value)
+      returnsJson(responseForSaveRequestParser.stringify(response))
+    }
+
+    def errors(error: Error): Unit = {
+      val response = Response[CreditCardToken](error = error)
+      returnsJson(responseForSaveRequestParser.stringify(response))
+    }
+
+    protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
+      val parsedRequest = saveRequestParser.parse(entity.asString)
+      parsedRequest == request
+    }
+  }
+
+  class DeleteCtx(request: DeleteRequest) extends Ctx("/delete") {
+    def returns(value: DeleteResponse): Unit = {
+      val response = Response[DeleteResponse](value = value)
+      returnsJson(responseForDeleteRequestParser.stringify(response))
+    }
+
+    def errors(error: Error): Unit = {
+      val response = Response[DeleteResponse](error = error)
+      returnsJson(responseForDeleteRequestParser.stringify(response))
+    }
+
+    protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
+      val parsedRequest = deleteRequestParser.parse(entity.asString)
+      parsedRequest == request
+    }
+  }
 }

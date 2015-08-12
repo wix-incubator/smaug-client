@@ -3,7 +3,7 @@ package com.wix.pay.creditcard.tokenizer
 
 import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
 import com.twitter.util.{Return, Throw, Try}
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
+import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, DeleteRequest, DeleteResponse, InTransitRequest, SaveRequest, TokenizeRequest}
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
 import com.wix.restaurants.common.protocol.api.{Error, Response}
 
@@ -24,6 +24,10 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
   private val inTransitRequestParser = new InTransitRequestParser
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
+  private val saveRequestParser = new SaveRequestParser
+  private val responseForSaveRequestParser = new ResponseForSaveRequestParser
+  private val deleteRequestParser = new DeleteRequestParser
+  private val responseForDeleteRequestParser = new ResponseForDeleteRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
 
   override def tokenize(card: CreditCard): Try[CreditCardToken] = {
@@ -38,8 +42,8 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       responseForTokenizeRequestParser.parse(responseJson)
     } match {
       case Return(response) => response match {
-        case ResponseHasError(error) => Throw(exceptionsTranslator.translateError(error))
-        case ResponseHasValue(value) => Return(value)
+        case ResponseForTokenizeRequestHasError(error) => Throw(exceptionsTranslator.translateError(error))
+        case ResponseForTokenizeRequestHasValue(value) => Return(value)
       }
       case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
     }
@@ -59,22 +63,54 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       responseForInTransitRequestParser.parse(responseJson)
     } match {
       case Return(response) => response match {
-        case ResponseHasError(error) => Throw(exceptionsTranslator.translateError(error))
-        case ResponseHasValue(value) => Return(value)
+        case ResponseForInTransitRequestHasError(error) => Throw(exceptionsTranslator.translateError(error))
+        case ResponseForInTransitRequestHasValue(value) => Return(value)
       }
       case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
     }
   }
 
-  override def save(temporaryToken: CreditCardToken): Try[CreditCardToken] = {
+  override def save(inTransitToken: CreditCardToken): Try[CreditCardToken] = {
     Try {
-      throw new UnsupportedOperationException("save is not implemented")
+      require(accessToken.isDefined, "save requires an access token")
+
+      val request = SaveRequest(
+        accessToken = accessToken.get,
+        inTransitToken = inTransitToken
+      )
+      val requestJson = saveRequestParser.stringify(request)
+
+      val responseJson = doJsonRequest("/save", requestJson)
+
+      responseForSaveRequestParser.parse(responseJson)
+    } match {
+      case Return(response) => response match {
+        case ResponseForSaveRequestHasError(error) => Throw(exceptionsTranslator.translateError(error))
+        case ResponseForSaveRequestHasValue(value) => Return(value)
+      }
+      case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
     }
   }
 
   override def delete(permanentToken: CreditCardToken): Try[Boolean] = {
     Try {
-      throw new UnsupportedOperationException("delete is not implemented")
+      require(accessToken.isDefined, "delete requires an access token")
+
+      val request = DeleteRequest(
+        accessToken = accessToken.get,
+        permanentToken = permanentToken
+      )
+      val requestJson = deleteRequestParser.stringify(request)
+
+      val responseJson = doJsonRequest("/delete", requestJson)
+
+      responseForDeleteRequestParser.parse(responseJson)
+    } match {
+      case Return(response) => response match {
+        case ResponseForDeleteRequestHasError(error) => Throw(exceptionsTranslator.translateError(error))
+        case ResponseForDeleteRequestHasValue(value) => Return(value.existed)
+      }
+      case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
     }
   }
 
@@ -98,10 +134,30 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   }
 }
 
-object ResponseHasValue {
+object ResponseForTokenizeRequestHasValue {
   def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = Option(response.value)
 }
-
-object ResponseHasError {
+object ResponseForTokenizeRequestHasError {
   def unapply(response: Response[CreditCardToken]): Option[Error] = Option(response.error)
+}
+
+object ResponseForInTransitRequestHasValue {
+  def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = Option(response.value)
+}
+object ResponseForInTransitRequestHasError {
+  def unapply(response: Response[CreditCardToken]): Option[Error] = Option(response.error)
+}
+
+object ResponseForSaveRequestHasValue {
+  def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = Option(response.value)
+}
+object ResponseForSaveRequestHasError {
+  def unapply(response: Response[CreditCardToken]): Option[Error] = Option(response.error)
+}
+
+object ResponseForDeleteRequestHasValue {
+  def unapply(response: Response[DeleteResponse]): Option[DeleteResponse] = Option(response.value)
+}
+object ResponseForDeleteRequestHasError {
+  def unapply(response: Response[DeleteResponse]): Option[Error] = Option(response.error)
 }
