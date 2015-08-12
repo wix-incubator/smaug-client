@@ -35,23 +35,10 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     permanentToken = somePermanentCardToken,
     additionalInfo = someAdditionalCardInfo
   )
-  val aSaveRequest = SaveRequest(
-    accessToken = someAccessToken,
-    inTransitToken = someInTransitToken
-  )
-  val aDeleteRequest = DeleteRequest(
-    accessToken = someAccessToken,
-    permanentToken = somePermanentCardToken
-  )
-  def someDeleteResponse(existed: Boolean) = DeleteResponse(existed = existed)
 
-  val cardsStoreBridgeWithPublicAccess = new DefaultTokenizerClient(
-    requestFactory = new NetHttpTransport().createRequestFactory(),
-    endpointUrl = s"http://localhost:$cardsStoreBridgePort")
   val cardsStoreBridge = new DefaultTokenizerClient(
     requestFactory = new NetHttpTransport().createRequestFactory(),
-    endpointUrl = s"http://localhost:$cardsStoreBridgePort",
-    accessToken = Some(someAccessToken))
+    endpointUrl = s"http://localhost:$cardsStoreBridgePort")
 
   val driver = new TokenizerDriver(port = cardsStoreBridgePort)
 
@@ -77,7 +64,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     "return an in-transit card token on success" in new Ctx {
       driver.aTokenizeFor(aTokenizeRequest) returns someInTransitToken
 
-      cardsStoreBridgeWithPublicAccess.tokenize(
+      cardsStoreBridge.tokenize(
         card = someCard
       ) must be_===(Return(someInTransitToken))
     }
@@ -86,7 +73,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       val someErrorMessage = "some error message"
       driver.aTokenizeFor(aTokenizeRequest) errors anInternalError(someErrorMessage)
 
-      cardsStoreBridgeWithPublicAccess.tokenize(
+      cardsStoreBridge.tokenize(
         card = someCard
       ) must be_===(Throw(TokenizerInternalException(someErrorMessage)))
     }
@@ -96,7 +83,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     "return an in-transit card token on success" in new Ctx {
       driver.anInTransitFor(anInTransitRequest) returns someInTransitToken
 
-      cardsStoreBridgeWithPublicAccess.inTransit(
+      cardsStoreBridge.inTransit(
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo
       ) must be_===(Return(someInTransitToken))
@@ -106,48 +93,9 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       val someErrorMessage = "some error message"
       driver.anInTransitFor(anInTransitRequest) errors anInternalError(someErrorMessage)
 
-      cardsStoreBridgeWithPublicAccess.inTransit(
+      cardsStoreBridge.inTransit(
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo
-      ) must be_===(Throw(TokenizerInternalException(someErrorMessage)))
-    }
-  }
-
-  "saving an in-transit card token" should {
-    "return a permanent card token on success" in new Ctx {
-      driver.aSaveFor(aSaveRequest) returns somePermanentCardToken
-
-      cardsStoreBridge.save(
-        inTransitToken = someInTransitToken
-      ) must be_===(Return(somePermanentCardToken))
-    }
-
-    "gracefully fail on error" in new Ctx {
-      val someErrorMessage = "some error message"
-      driver.aSaveFor(aSaveRequest) errors anInternalError(someErrorMessage)
-
-      cardsStoreBridge.save(
-        inTransitToken = someInTransitToken
-      ) must be_===(Throw(TokenizerInternalException(someErrorMessage)))
-    }
-  }
-
-  "deleting a permanent card token" should {
-    "return a valid response on success" in new Ctx {
-      val existed = true
-      driver.aDeleteFor(aDeleteRequest) returns someDeleteResponse(existed = existed)
-
-      cardsStoreBridge.delete(
-        permanentToken = somePermanentCardToken
-      ) must be_===(Return(existed))
-    }
-
-    "gracefully fail on error" in new Ctx {
-      val someErrorMessage = "some error message"
-      driver.aDeleteFor(aDeleteRequest) errors anInternalError(someErrorMessage)
-
-      cardsStoreBridge.delete(
-        permanentToken = somePermanentCardToken
       ) must be_===(Throw(TokenizerInternalException(someErrorMessage)))
     }
   }

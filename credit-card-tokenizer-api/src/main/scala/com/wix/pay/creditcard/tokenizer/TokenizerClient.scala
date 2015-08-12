@@ -9,8 +9,4 @@ trait TokenizerClient {
 
   def inTransit(permanentToken: CreditCardToken,
                 additionalInfo: Option[CreditCardOptionalFields] = None): Try[CreditCardToken]
-
-  def save(inTransitToken: CreditCardToken): Try[CreditCardToken]
-
-  def delete(permanentToken: CreditCardToken): Try[Boolean]
 }
