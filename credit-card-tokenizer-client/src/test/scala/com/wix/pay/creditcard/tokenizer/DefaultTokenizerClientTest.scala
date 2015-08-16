@@ -91,6 +91,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
 
     "gracefully fail on error" in new Ctx {
       val someErrorMessage = "some error message"
+
       driver.anInTransitFor(anInTransitRequest) errors anInternalError(someErrorMessage)
 
       cardsStoreBridge.inTransit(

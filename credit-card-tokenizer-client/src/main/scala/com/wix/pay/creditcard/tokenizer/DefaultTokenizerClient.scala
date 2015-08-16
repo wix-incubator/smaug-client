@@ -53,7 +53,7 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       )
       val requestJson = inTransitRequestParser.stringify(request)
 
-      val responseJson = doJsonRequest("/inTransit", requestJson)
+      val responseJson = doJsonRequest("/intransit", requestJson)
 
       responseForInTransitRequestParser.parse(responseJson)
     } match {

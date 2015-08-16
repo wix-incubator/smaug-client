@@ -70,7 +70,7 @@ class TokenizerDriver(port: Int) {
     }
   }
 
-  class InTransitCtx(request: InTransitRequest) extends Ctx("/inTransit") {
+  class InTransitCtx(request: InTransitRequest) extends Ctx("/intransit") {
     def returns(value: CreditCardToken): Unit = {
       val response = Response[CreditCardToken](value = value)
       returnsJson(responseForInTransitRequestParser.stringify(response))
