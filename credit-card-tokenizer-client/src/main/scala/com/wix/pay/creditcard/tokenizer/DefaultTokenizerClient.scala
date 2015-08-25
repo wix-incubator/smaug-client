@@ -1,6 +1,8 @@
 package com.wix.pay.creditcard.tokenizer
 
 
+import java.net.URL
+
 import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
 import com.twitter.util.{Return, Throw, Try}
 import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
@@ -24,6 +26,15 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   private val inTransitRequestParser = new InTransitRequestParser
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
+
+  override def formUrl(): Try[URL] = {
+    Try {
+      Option(getAndExtractLocationHeader("/form")) match {
+        case Some(url) => new URL(url)
+        case None => throw TokenizerInternalException("Form endpoint did not return location header")
+      }
+    }
+  }
 
   override def tokenize(card: CreditCard): Try[CreditCardToken] = {
     Try {
@@ -65,6 +76,24 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
     }
   }
 
+  private def getAndExtractLocationHeader(resource: String): String = {
+    val httpRequest = requestFactory.buildGetRequest(new GenericUrl(endpointUrl + resource))
+
+    connectTimeout foreach (connectTimeout => httpRequest.setConnectTimeout(connectTimeout.toMillis.toInt))
+    readTimeout foreach (readTimeout => httpRequest.setReadTimeout(readTimeout.toMillis.toInt))
+    httpRequest.setNumberOfRetries(numberOfRetries)
+
+    httpRequest.setFollowRedirects(false)
+    httpRequest.setThrowExceptionOnExecuteError(false)
+
+    val httpResponse = httpRequest.execute()
+    try {
+      httpResponse.getHeaders.getLocation
+    } finally {
+      httpResponse.ignore()
+    }
+  }
+
   private def doJsonRequest(resource: String, requestJson: String): String = {
     val httpRequest = requestFactory.buildPostRequest(
       new GenericUrl(endpointUrl + resource),
@@ -83,6 +112,7 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       httpResponse.ignore()
     }
   }
+
 }
 
 object ResponseForTokenizeRequestHasValue {

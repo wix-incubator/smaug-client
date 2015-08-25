@@ -1,6 +1,8 @@
 package com.wix.pay.creditcard.tokenizer
 
 
+import java.net.URL
+
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.twitter.util.{Return, Throw}
 import com.wix.pay.creditcard.tokenizer.model._
@@ -59,6 +61,14 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     driver.reset()
   }
 
+  "getting the card form URL" should {
+    "return the URL" in new Ctx {
+      val someUrl = new URL("https://www.example.org/someResource")
+      driver.aFormUrl() redirectsTo someUrl
+
+      cardsStoreBridge.formUrl() must be_===(Return(someUrl))
+    }
+  }
 
   "tokenizing a card" should {
     "return an in-transit card token on success" in new Ctx {

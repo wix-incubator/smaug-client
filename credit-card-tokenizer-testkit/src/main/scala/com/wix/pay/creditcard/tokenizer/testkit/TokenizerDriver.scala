@@ -1,10 +1,13 @@
 package com.wix.pay.creditcard.tokenizer.testkit
 
 
+import java.net.URL
+
 import com.wix.hoopoe.http.testkit.EmbeddedHttpProbe
 import com.wix.pay.creditcard.tokenizer._
 import com.wix.pay.creditcard.tokenizer.model._
 import com.wix.restaurants.common.protocol.api.{Error, Response}
+import spray.http.HttpHeaders.Location
 import spray.http._
 
 
@@ -25,6 +28,10 @@ class TokenizerDriver(port: Int) {
 
   def reset() {
     probe.handlers.clear()
+  }
+
+  def aFormUrl(): FormUrlCtx = {
+    new FormUrlCtx
   }
 
   def aTokenizeFor(request: TokenizeRequest): TokenizeCtx = {
@@ -51,6 +58,23 @@ class TokenizerDriver(port: Int) {
     }
 
     protected def isStubbedRequestEntity(entity: HttpEntity): Boolean
+  }
+
+  class FormUrlCtx {
+    def redirectsTo(url: URL): Unit = {
+      probe.handlers += {
+        case HttpRequest(
+        HttpMethods.GET,
+        Uri.Path("/form"),
+        _,
+        entity,
+        _) =>
+          HttpResponse(
+            status = StatusCodes.Found,
+            headers = List(Location(Uri(url.toString)))
+          )
+      }
+    }
   }
 
   class TokenizeCtx(request: TokenizeRequest) extends Ctx("/tokenize") {
