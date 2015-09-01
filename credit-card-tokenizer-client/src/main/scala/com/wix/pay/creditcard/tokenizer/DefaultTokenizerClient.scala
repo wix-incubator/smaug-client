@@ -1,7 +1,7 @@
 package com.wix.pay.creditcard.tokenizer
 
 
-import java.net.URL
+import java.net.{URLEncoder, URL}
 
 import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
 import com.twitter.util.{Return, Throw, Try}
@@ -27,9 +27,10 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
 
-  override def formUrl(): Try[URL] = {
+  override def formUrl(params: String): Try[URL] = {
     Try {
-      Option(getAndExtractLocationHeader("/form")) match {
+      val resource = s"/form?params=${URLEncoder.encode(params, "UTF-8")}"
+      Option(getAndExtractLocationHeader(resource)) match {
         case Some(url) => new URL(url)
         case None => throw TokenizerInternalException("Form endpoint did not return location header")
       }

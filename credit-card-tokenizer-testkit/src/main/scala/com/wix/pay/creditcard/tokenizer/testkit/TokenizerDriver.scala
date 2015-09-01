@@ -30,8 +30,8 @@ class TokenizerDriver(port: Int) {
     probe.handlers.clear()
   }
 
-  def aFormUrl(): FormUrlCtx = {
-    new FormUrlCtx
+  def aFormUrl(params: String): FormUrlCtx = {
+    new FormUrlCtx(params)
   }
 
   def aTokenizeFor(request: TokenizeRequest): TokenizeCtx = {
@@ -60,15 +60,15 @@ class TokenizerDriver(port: Int) {
     protected def isStubbedRequestEntity(entity: HttpEntity): Boolean
   }
 
-  class FormUrlCtx {
+  class FormUrlCtx(params: String) {
     def redirectsTo(url: URL): Unit = {
       probe.handlers += {
         case HttpRequest(
         HttpMethods.GET,
-        Uri.Path("/form"),
+        requestUri,
         _,
         entity,
-        _) =>
+        _) if requestUri.path == Uri.Path("/form") && requestUri.query == Uri.Query("params" -> params) =>
           HttpResponse(
             status = StatusCodes.Found,
             headers = List(Location(Uri(url.toString)))
