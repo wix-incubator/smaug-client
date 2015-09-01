@@ -27,9 +27,9 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
 
-  override def formUrl(params: String): Try[URL] = {
+  override def formUrl(params: Option[String] = None): Try[URL] = {
     Try {
-      val resource = s"/form?params=${URLEncoder.encode(params, "UTF-8")}"
+      val resource = "/form" + params.map(params => s"?params=${URLEncoder.encode(params, "UTF-8")}").getOrElse("")
       Option(getAndExtractLocationHeader(resource)) match {
         case Some(url) => new URL(url)
         case None => throw TokenizerInternalException("Form endpoint did not return location header")

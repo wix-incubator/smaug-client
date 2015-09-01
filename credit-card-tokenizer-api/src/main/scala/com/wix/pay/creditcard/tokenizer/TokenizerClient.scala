@@ -7,7 +7,7 @@ import com.wix.pay.creditcard.tokenizer.model.CreditCardToken
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
 
 trait TokenizerClient {
-  def formUrl(params: String): Try[URL]
+  def formUrl(params: Option[String] = None): Try[URL]
 
   def tokenize(card: CreditCard): Try[CreditCardToken]
 

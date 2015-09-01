@@ -62,20 +62,27 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
   }
 
   "getting the card form URL" should {
+    "return the URL for simple with no parameters" in new Ctx {
+      val someUrl = new URL("https://www.example.org/someResource")
+      driver.aFormUrl() redirectsTo someUrl
+
+      cardsStoreBridge.formUrl() must be_===(Return(someUrl))
+    }
+
     "return the URL for simple query" in new Ctx {
       val someSimpleParams = "someParams"
       val someUrl = new URL("https://www.example.org/someResource")
-      driver.aFormUrl(someSimpleParams) redirectsTo someUrl
+      driver.aFormUrl(Some(someSimpleParams)) redirectsTo someUrl
 
-      cardsStoreBridge.formUrl(someSimpleParams) must be_===(Return(someUrl))
+      cardsStoreBridge.formUrl(Some(someSimpleParams)) must be_===(Return(someUrl))
     }
 
     "return the URL for query with special characters" in new Ctx {
       val someParamsWithSpecialCharacters = "ab&wx=yz"
       val someUrl = new URL("https://www.example.org/someResource")
-      driver.aFormUrl(someParamsWithSpecialCharacters) redirectsTo someUrl
+      driver.aFormUrl(Some(someParamsWithSpecialCharacters)) redirectsTo someUrl
 
-      cardsStoreBridge.formUrl(someParamsWithSpecialCharacters) must be_===(Return(someUrl))
+      cardsStoreBridge.formUrl(Some(someParamsWithSpecialCharacters)) must be_===(Return(someUrl))
     }
   }
 
