@@ -54,7 +54,7 @@
         <dependency>
             <groupId>com.wix.restaurants</groupId>
             <artifactId>common-protocol-api</artifactId>
-            <version>1.7.0-SNAPSHOT</version>
+            <version>${com.wix.restaurants.common.protocol.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
