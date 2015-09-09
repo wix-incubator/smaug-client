@@ -4,7 +4,7 @@
 
     <groupId>com.wix.pay</groupId>
     <artifactId>credit-card-tokenizer-client-all</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Credit Card Tokenizer Client</name>
     <description>Credit Card Tokenizer Client modules pom</description>
@@ -58,7 +58,7 @@
 		<url>https://github.com/wix/credit-card-tokenizer-client</url>
 		<connection>scm:git:git://github.com/wix/credit-card-tokenizer-client.git</connection>
 		<developerConnection>scm:git:git@github.com:wix/credit-card-tokenizer-client.git</developerConnection>
-	  <tag>credit-card-tokenizer-client-all-1.4.0</tag>
+	  <tag>HEAD</tag>
   </scm>	
 	
     <properties>
