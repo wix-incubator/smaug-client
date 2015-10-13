@@ -117,15 +117,15 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
 }
 
 object ResponseForTokenizeRequestHasValue {
-  def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = Option(response.value)
+  def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = response.value
 }
 object ResponseForTokenizeRequestHasError {
-  def unapply(response: Response[CreditCardToken]): Option[Error] = Option(response.error)
+  def unapply(response: Response[CreditCardToken]): Option[Error] = response.error
 }
 
 object ResponseForInTransitRequestHasValue {
-  def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = Option(response.value)
+  def unapply(response: Response[CreditCardToken]): Option[CreditCardToken] = response.value
 }
 object ResponseForInTransitRequestHasError {
-  def unapply(response: Response[CreditCardToken]): Option[Error] = Option(response.error)
+  def unapply(response: Response[CreditCardToken]): Option[Error] = response.error
 }

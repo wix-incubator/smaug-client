@@ -68,7 +68,7 @@
         <scala.dependencies.version>2.11</scala.dependencies.version>
         <scala.library.version>2.11.7</scala.library.version>
 		<com.wix.pay.creditcard.version>1.5.0</com.wix.pay.creditcard.version>
-        <com.wix.restaurants.common.protocol.version>1.8.0</com.wix.restaurants.common.protocol.version>
+        <com.wix.restaurants.common.protocol.version>1.11.0</com.wix.restaurants.common.protocol.version>
         <com.wix.hoopoe.http.version>0.0.1</com.wix.hoopoe.http.version>
         <org.specs2.version>3.6.4</org.specs2.version>
         <com.google.http.client.version>1.20.0</com.google.http.client.version>
