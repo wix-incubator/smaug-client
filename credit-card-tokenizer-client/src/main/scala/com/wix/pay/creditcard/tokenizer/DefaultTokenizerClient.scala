@@ -1,15 +1,15 @@
 package com.wix.pay.creditcard.tokenizer
 
 
-import java.net.{URLEncoder, URL}
+import java.net.{URL, URLEncoder}
 
 import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
-import com.twitter.util.{Return, Throw, Try}
 import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
 import com.wix.restaurants.common.protocol.api.{Error, Response}
 
 import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success, Try}
 
 
 object Endpoints {
@@ -48,11 +48,11 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
 
       responseForTokenizeRequestParser.parse(responseJson)
     } match {
-      case Return(response) => response match {
-        case ResponseForTokenizeRequestHasError(error) => Throw(exceptionsTranslator.translateError(error))
-        case ResponseForTokenizeRequestHasValue(value) => Return(value)
+      case Success(response) => response match {
+        case ResponseForTokenizeRequestHasError(error) => Failure(exceptionsTranslator.translateError(error))
+        case ResponseForTokenizeRequestHasValue(value) => Success(value)
       }
-      case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
+      case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
     }
   }
 
@@ -69,11 +69,11 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
 
       responseForInTransitRequestParser.parse(responseJson)
     } match {
-      case Return(response) => response match {
-        case ResponseForInTransitRequestHasError(error) => Throw(exceptionsTranslator.translateError(error))
-        case ResponseForInTransitRequestHasValue(value) => Return(value)
+      case Success(response) => response match {
+        case ResponseForInTransitRequestHasError(error) => Failure(exceptionsTranslator.translateError(error))
+        case ResponseForInTransitRequestHasValue(value) => Success(value)
       }
-      case Throw(e) => Throw(new TokenizerInternalException(e.getMessage, e))
+      case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
     }
   }
 

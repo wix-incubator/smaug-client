@@ -47,11 +47,6 @@
             <version>${com.wix.pay.creditcard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>util-core_${scala.dependencies.version}</artifactId>
-            <version>6.20.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.wix.restaurants</groupId>
             <artifactId>common-protocol-api</artifactId>
             <version>${com.wix.restaurants.common.protocol.version}</version>

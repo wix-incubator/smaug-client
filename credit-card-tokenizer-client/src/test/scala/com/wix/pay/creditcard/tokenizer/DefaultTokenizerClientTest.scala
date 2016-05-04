@@ -4,13 +4,14 @@ package com.wix.pay.creditcard.tokenizer
 import java.net.URL
 
 import com.google.api.client.http.javanet.NetHttpTransport
-import com.twitter.util.{Return, Throw}
 import com.wix.pay.creditcard.tokenizer.model._
 import com.wix.pay.creditcard.tokenizer.testkit.TokenizerDriver
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields, PublicCreditCard, YearMonth}
 import com.wix.restaurants.common.protocol.api.Error
 import org.specs2.mutable.SpecWithJUnit
 import org.specs2.specification.Scope
+
+import scala.util.{Failure, Success}
 
 
 class DefaultTokenizerClientTest extends SpecWithJUnit {
@@ -66,7 +67,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       val someUrl = new URL("https://www.example.org/someResource")
       driver.aFormUrl() redirectsTo someUrl
 
-      cardsStoreBridge.formUrl() must be_===(Return(someUrl))
+      cardsStoreBridge.formUrl() must be_===(Success(someUrl))
     }
 
     "return the URL for simple query" in new Ctx {
@@ -74,7 +75,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       val someUrl = new URL("https://www.example.org/someResource")
       driver.aFormUrl(Some(someSimpleParams)) redirectsTo someUrl
 
-      cardsStoreBridge.formUrl(Some(someSimpleParams)) must be_===(Return(someUrl))
+      cardsStoreBridge.formUrl(Some(someSimpleParams)) must be_===(Success(someUrl))
     }
 
     "return the URL for query with special characters" in new Ctx {
@@ -82,7 +83,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       val someUrl = new URL("https://www.example.org/someResource")
       driver.aFormUrl(Some(someParamsWithSpecialCharacters)) redirectsTo someUrl
 
-      cardsStoreBridge.formUrl(Some(someParamsWithSpecialCharacters)) must be_===(Return(someUrl))
+      cardsStoreBridge.formUrl(Some(someParamsWithSpecialCharacters)) must be_===(Success(someUrl))
     }
   }
 
@@ -92,7 +93,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
 
       cardsStoreBridge.tokenize(
         card = someCard
-      ) must be_===(Return(someInTransitToken))
+      ) must be_===(Success(someInTransitToken))
     }
 
     "gracefully fail on error" in new Ctx {
@@ -101,7 +102,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
 
       cardsStoreBridge.tokenize(
         card = someCard
-      ) must be_===(Throw(TokenizerInternalException(someErrorMessage)))
+      ) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
     }
   }
 
@@ -112,7 +113,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       cardsStoreBridge.inTransit(
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo
-      ) must be_===(Return(someInTransitToken))
+      ) must be_===(Success(someInTransitToken))
     }
 
     "gracefully fail on error" in new Ctx {
@@ -123,7 +124,7 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       cardsStoreBridge.inTransit(
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo
-      ) must be_===(Throw(TokenizerInternalException(someErrorMessage)))
+      ) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
     }
   }
 
