@@ -10,6 +10,7 @@ class ExceptionsTranslator {
     error.code match {
       case ErrorCodes.unauthorized => UnauthorizedException(error.description)
       case ErrorCodes.internal => TokenizerInternalException(error.description)
+      case ErrorCodes.unauthenticated => AuthenticationException(error.description)
       case _ => TokenizerInternalException(error.description)
     }
   }
