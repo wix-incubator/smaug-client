@@ -11,6 +11,7 @@ class ExceptionsTranslator {
       case ErrorCodes.unauthorized => UnauthorizedException(error.description)
       case ErrorCodes.internal => TokenizerInternalException(error.description)
       case ErrorCodes.unauthenticated => AuthenticationException(error.description)
+      case ErrorCodes.unauthorizedNG => AuthorizationException()
       case _ => TokenizerInternalException(error.description)
     }
   }
