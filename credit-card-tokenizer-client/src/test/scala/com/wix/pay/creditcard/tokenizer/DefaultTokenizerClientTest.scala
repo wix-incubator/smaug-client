@@ -1,23 +1,28 @@
+/*      __ __ _____  __                                              *\
+**     / // // /_/ |/ /          Wix                                 **
+**    / // // / /|   /           (c) 2006-2017, Wix LTD.             **
+**   / // // / //   |            http://www.wix.com/                 **
+**   \__/|__/_//_/| |                                                **
+\*                |/                                                 */
 package com.wix.pay.creditcard.tokenizer
 
 
 import java.net.URL
-
+import scala.util.{Failure, Success}
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.Scope
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.wix.pay.creditcard.tokenizer.model._
 import com.wix.pay.creditcard.tokenizer.testkit.TokenizerDriver
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields, PublicCreditCard, YearMonth}
 import com.wix.restaurants.common.protocol.api.Error
-import org.specs2.mutable.SpecWithJUnit
-import org.specs2.specification.Scope
-
-import scala.util.{Failure, Success}
 
 
 class DefaultTokenizerClientTest extends SpecWithJUnit {
   val cardsStoreBridgePort = 10001
 
   val someAccessToken = "some access token"
+  val someTenantId = "some tenant ID"
   val someCard = CreditCard(
     number = "4111111111111111",
     expiration = YearMonth(
@@ -31,13 +36,17 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     creditCard = PublicCreditCard(someCard))
 
   val aTokenizeRequest = TokenizeRequest(card = someCard)
+  val aTokenizeRequestNG: String => TokenizeRequestNG = tenantId => TokenizeRequestNG(someCard, tenantId)
   val someAdditionalCardInfo = Some(CreditCardOptionalFields.withFields(
     csc = Some("123")
   ))
   val anInTransitRequest = InTransitRequest(
     permanentToken = somePermanentCardToken,
-    additionalInfo = someAdditionalCardInfo
-  )
+    additionalInfo = someAdditionalCardInfo)
+  val anInTransitRequestNG: String => InTransitRequestNG = tenantId => InTransitRequestNG(
+    permanentToken = somePermanentCardToken,
+    additionalInfo = someAdditionalCardInfo,
+    tenantId = tenantId)
 
   val cardsStoreBridge = new DefaultTokenizerClient(
     requestFactory = new NetHttpTransport().createRequestFactory(),
@@ -105,6 +114,21 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
       ) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
     }
   }
+  "tokenizing a card NG" should {
+    "return an in-transit card token on success" in new Ctx {
+      driver.aTokenizeRequest(aTokenizeRequestNG(someTenantId)) returns someInTransitToken
+
+      cardsStoreBridge.tokenizeNG(card = someCard, tenantId = someTenantId) must be_===(Success(someInTransitToken))
+    }
+
+    "gracefully fail on error" in new Ctx {
+      val someErrorMessage = "some error message"
+      driver.aTokenizeRequest(aTokenizeRequestNG(someTenantId)) errors anInternalError(someErrorMessage)
+
+      cardsStoreBridge.tokenizeNG(card = someCard, tenantId = someTenantId) must be_===(Failure(
+        TokenizerInternalException(someErrorMessage)))
+    }
+  }
 
   "converting a permanent card token" should {
     "return an in-transit card token on success" in new Ctx {
@@ -125,6 +149,27 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo
       ) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
+    }
+  }
+  "converting a permanent card token NG" should {
+    "return an in-transit card token on success" in new Ctx {
+      driver.anInTransitRequest(anInTransitRequestNG(someTenantId)) returns someInTransitToken
+
+      cardsStoreBridge.inTransitNG(
+        permanentToken = somePermanentCardToken,
+        additionalInfo = someAdditionalCardInfo,
+        tenantId = someTenantId) must be_===(Success(someInTransitToken))
+    }
+
+    "gracefully fail on error" in new Ctx {
+      val someErrorMessage = "some error message"
+
+      driver.anInTransitRequest(anInTransitRequestNG(someTenantId)) errors anInternalError(someErrorMessage)
+
+      cardsStoreBridge.inTransitNG(
+        permanentToken = somePermanentCardToken,
+        additionalInfo = someAdditionalCardInfo,
+        tenantId = someTenantId) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
     }
   }
 

@@ -14,5 +14,6 @@ import com.wix.pay.creditcard.CreditCardOptionalFields
   *
   * @author <a href="mailto:ohadr@wix.com">Raz, Ohad</a>
   */
+@deprecated(message = "use InTransitRequestNG instead", since = "right now")
 case class InTransitRequest(permanentToken: CreditCardToken,
                             additionalInfo: Option[CreditCardOptionalFields] = None)

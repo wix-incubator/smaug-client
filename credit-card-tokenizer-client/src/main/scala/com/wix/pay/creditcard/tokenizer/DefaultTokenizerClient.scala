@@ -1,20 +1,25 @@
+/*      __ __ _____  __                                              *\
+**     / // // /_/ |/ /          Wix                                 **
+**    / // // / /|   /           (c) 2006-2017, Wix LTD.             **
+**   / // // / //   |            http://www.wix.com/                 **
+**   \__/|__/_//_/| |                                                **
+\*                |/                                                 */
 package com.wix.pay.creditcard.tokenizer
 
 
 import java.net.{URL, URLEncoder}
-
-import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
-import com.wix.pay.creditcard.tokenizer.model.{CreditCardToken, InTransitRequest, TokenizeRequest}
-import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
-import com.wix.restaurants.common.protocol.api.{Error, Response}
-
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
+import com.google.api.client.http.{ByteArrayContent, GenericUrl, HttpRequestFactory}
+import com.wix.pay.creditcard.tokenizer.model._
+import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields}
+import com.wix.restaurants.common.protocol.api.{Error, Response}
 
 
 object Endpoints {
   val production = "https://pay.wix.com/cards"
 }
+
 
 class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
                              connectTimeout: Option[Duration] = None,
@@ -22,14 +27,17 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
                              numberOfRetries: Int = 0,
                              endpointUrl: String = Endpoints.production) extends TokenizerClient {
   private val tokenizeRequestParser = new TokenizeRequestParser
+  private val tokenizeRequestParserNG = new TokenizeRequestParserNG
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
   private val inTransitRequestParser = new InTransitRequestParser
+  private val inTransitRequestParserNG = new InTransitRequestParserNG
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
 
   override def formUrl(params: Option[String] = None): Try[URL] = {
     Try {
       val resource = "/form" + params.map(params => s"?params=${URLEncoder.encode(params, "UTF-8")}").getOrElse("")
+
       Option(getAndExtractLocationHeader(resource)) match {
         case Some(url) => new URL(url)
         case None => throw TokenizerInternalException("Form endpoint did not return location header")
@@ -37,13 +45,11 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
     }
   }
 
+  @deprecated(message = "use tokenizeNG instead", since = "right now")
   override def tokenize(card: CreditCard): Try[CreditCardToken] = {
     Try {
-      val request = TokenizeRequest(
-        card = card
-      )
+      val request = TokenizeRequest(card = card)
       val requestJson = tokenizeRequestParser.stringify(request)
-
       val responseJson = doJsonRequest("/tokenize", requestJson)
 
       responseForTokenizeRequestParser.parse(responseJson)
@@ -55,7 +61,24 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
     }
   }
+  override def tokenizeNG(card: CreditCard, tenantId: String): Try[CreditCardToken] = {
+    Try {
+      val request = TokenizeRequestNG(card = card, tenantId = tenantId)
+      val requestJson = tokenizeRequestParserNG.stringify(request)
 
+      val responseJson = doJsonRequest("/tokenizeNG", requestJson)
+
+      responseForTokenizeRequestParser.parse(responseJson)
+    } match {
+      case Success(response) => response match {
+        case ResponseForTokenizeRequestHasError(error) => Failure(exceptionsTranslator.translateError(error))
+        case ResponseForTokenizeRequestHasValue(value) => Success(value)
+      }
+      case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
+    }
+  }
+
+  @deprecated(message = "use inTransitNG instead", since = "right now")
   override def inTransit(permanentToken: CreditCardToken,
                          additionalInfo: Option[CreditCardOptionalFields] = None): Try[CreditCardToken] = {
     Try {
@@ -66,6 +89,27 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       val requestJson = inTransitRequestParser.stringify(request)
 
       val responseJson = doJsonRequest("/intransit", requestJson)
+
+      responseForInTransitRequestParser.parse(responseJson)
+    } match {
+      case Success(response) => response match {
+        case ResponseForInTransitRequestHasError(error) => Failure(exceptionsTranslator.translateError(error))
+        case ResponseForInTransitRequestHasValue(value) => Success(value)
+      }
+      case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
+    }
+  }
+  override def inTransitNG(permanentToken: CreditCardToken,
+                           additionalInfo: Option[CreditCardOptionalFields] = None,
+                           tenantId: String): Try[CreditCardToken] = {
+    Try {
+      val request = InTransitRequestNG(
+        permanentToken = permanentToken,
+        additionalInfo = additionalInfo,
+        tenantId = tenantId)
+      val requestJson = inTransitRequestParserNG.stringify(request)
+
+      val responseJson = doJsonRequest("/intransitNG", requestJson)
 
       responseForInTransitRequestParser.parse(responseJson)
     } match {
