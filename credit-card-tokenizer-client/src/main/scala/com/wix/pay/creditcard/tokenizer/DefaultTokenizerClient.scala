@@ -26,11 +26,9 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
                              readTimeout: Option[Duration] = None,
                              numberOfRetries: Int = 0,
                              endpointUrl: String = Endpoints.production) extends TokenizerClient {
-  private val tokenizeRequestParser = new TokenizeRequestParser
-  private val tokenizeRequestParserNG = new TokenizeRequestParserNG
+  private val tokenizeRequestParserNG = new TokenizeRequestParser
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
-  private val inTransitRequestParser = new InTransitRequestParser
-  private val inTransitRequestParserNG = new InTransitRequestParserNG
+  private val inTransitRequestParserNG = new InTransitRequestParser
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
   private val exceptionsTranslator = new ExceptionsTranslator
 
@@ -45,11 +43,11 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
     }
   }
 
-  @deprecated(message = "use tokenizeNG instead", since = "right now")
-  override def tokenize(card: CreditCard): Try[CreditCardToken] = {
+  override def tokenize(card: CreditCard, tenantId: String): Try[CreditCardToken] = {
     Try {
-      val request = TokenizeRequest(card = card)
-      val requestJson = tokenizeRequestParser.stringify(request)
+      val request = TokenizeRequest(card = card, tenantId = tenantId)
+      val requestJson = tokenizeRequestParserNG.stringify(request)
+
       val responseJson = doJsonRequest("/tokenize", requestJson)
 
       responseForTokenizeRequestParser.parse(responseJson)
@@ -61,55 +59,18 @@ class DefaultTokenizerClient(requestFactory: HttpRequestFactory,
       case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
     }
   }
-  override def tokenizeNG(card: CreditCard, tenantId: String): Try[CreditCardToken] = {
-    Try {
-      val request = TokenizeRequestNG(card = card, tenantId = tenantId)
-      val requestJson = tokenizeRequestParserNG.stringify(request)
 
-      val responseJson = doJsonRequest("/tokenizeNG", requestJson)
-
-      responseForTokenizeRequestParser.parse(responseJson)
-    } match {
-      case Success(response) => response match {
-        case ResponseForTokenizeRequestHasError(error) => Failure(exceptionsTranslator.translateError(error))
-        case ResponseForTokenizeRequestHasValue(value) => Success(value)
-      }
-      case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
-    }
-  }
-
-  @deprecated(message = "use inTransitNG instead", since = "right now")
   override def inTransit(permanentToken: CreditCardToken,
-                         additionalInfo: Option[CreditCardOptionalFields] = None): Try[CreditCardToken] = {
+                         additionalInfo: Option[CreditCardOptionalFields] = None,
+                         tenantId: String): Try[CreditCardToken] = {
     Try {
       val request = InTransitRequest(
-        permanentToken = permanentToken,
-        additionalInfo = additionalInfo
-      )
-      val requestJson = inTransitRequestParser.stringify(request)
-
-      val responseJson = doJsonRequest("/intransit", requestJson)
-
-      responseForInTransitRequestParser.parse(responseJson)
-    } match {
-      case Success(response) => response match {
-        case ResponseForInTransitRequestHasError(error) => Failure(exceptionsTranslator.translateError(error))
-        case ResponseForInTransitRequestHasValue(value) => Success(value)
-      }
-      case Failure(e) => Failure(new TokenizerInternalException(e.getMessage, e))
-    }
-  }
-  override def inTransitNG(permanentToken: CreditCardToken,
-                           additionalInfo: Option[CreditCardOptionalFields] = None,
-                           tenantId: String): Try[CreditCardToken] = {
-    Try {
-      val request = InTransitRequestNG(
         permanentToken = permanentToken,
         additionalInfo = additionalInfo,
         tenantId = tenantId)
       val requestJson = inTransitRequestParserNG.stringify(request)
 
-      val responseJson = doJsonRequest("/intransitNG", requestJson)
+      val responseJson = doJsonRequest("/intransit", requestJson)
 
       responseForInTransitRequestParser.parse(responseJson)
     } match {

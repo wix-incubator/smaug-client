@@ -1,6 +1,6 @@
 /*      __ __ _____  __                                              *\
 **     / // // /_/ |/ /          Wix                                 **
-**    / // // / /|   /           (c) 2006-2015, Wix LTD.             **
+**    / // // / /|   /           (c) 2006-2017, Wix LTD.             **
 **   / // // / //   |            http://www.wix.com/                 **
 **   \__/|__/_//_/| |                                                **
 \*                |/                                                 */
@@ -14,6 +14,6 @@ import com.wix.pay.creditcard.CreditCardOptionalFields
   *
   * @author <a href="mailto:ohadr@wix.com">Raz, Ohad</a>
   */
-@deprecated(message = "use InTransitRequestNG instead", since = "right now")
 case class InTransitRequest(permanentToken: CreditCardToken,
-                            additionalInfo: Option[CreditCardOptionalFields] = None)
+                            additionalInfo: Option[CreditCardOptionalFields] = None,
+                            tenantId: String)

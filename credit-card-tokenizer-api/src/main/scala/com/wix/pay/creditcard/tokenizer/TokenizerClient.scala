@@ -46,9 +46,7 @@ trait TokenizerClient {
     * @return
     *         A credit-card token.
     */
-  @deprecated(message = "use tokenizeNG instead", since = "right now")
-  def tokenize(card: CreditCard): Try[CreditCardToken]
-  def tokenizeNG(card: CreditCard, tenantId: String): Try[CreditCardToken]
+  def tokenize(card: CreditCard, tenantId: String): Try[CreditCardToken]
 
   /** Creates a temporary ("''in-transit''") token from the given permanent (saved) token.
     * The ''temporary'' token holds all required data, including CVV (or CSC), for a predefined period of time; once
@@ -60,10 +58,7 @@ trait TokenizerClient {
     * @return
     *         A new credit-card token, representing the temporary token.
     */
-  @deprecated(message = "use inTransitNG instead", since = "right now")
   def inTransit(permanentToken: CreditCardToken,
-                additionalInfo: Option[CreditCardOptionalFields] = None): Try[CreditCardToken]
-  def inTransitNG(permanentToken: CreditCardToken,
-                  additionalInfo: Option[CreditCardOptionalFields] = None,
-                  tenantId: String): Try[CreditCardToken]
+                additionalInfo: Option[CreditCardOptionalFields] = None,
+                tenantId: String): Try[CreditCardToken]
 }

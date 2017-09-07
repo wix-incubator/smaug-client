@@ -1,6 +1,6 @@
 /*      __ __ _____  __                                              *\
 **     / // // /_/ |/ /          Wix                                 **
-**    / // // / /|   /           (c) 2006-2015, Wix LTD.             **
+**    / // // / /|   /           (c) 2006-2017, Wix LTD.             **
 **   / // // / //   |            http://www.wix.com/                 **
 **   \__/|__/_//_/| |                                                **
 \*                |/                                                 */
@@ -14,5 +14,4 @@ import com.wix.pay.creditcard.CreditCard
   *
   * @author <a href="mailto:ohadr@wix.com">Raz, Ohad</a>
   */
-@deprecated(message = "use TokenizeRequestNG instead", since = "right now")
-case class TokenizeRequest(card: CreditCard)
+case class TokenizeRequest(card: CreditCard, tenantId: String)

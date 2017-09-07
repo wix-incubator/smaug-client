@@ -8,19 +8,19 @@ import com.wix.restaurants.common.protocol.api.Error
 class ExceptionsTranslator {
   def translateError(error: Error): Throwable = {
     error.code match {
-      case ErrorCodes.unauthorized => UnauthorizedException(error.description)
-      case ErrorCodes.internal => TokenizerInternalException(error.description)
       case ErrorCodes.unauthenticated => AuthenticationException(error.description)
-      case ErrorCodes.unauthorizedNG => AuthorizationException()
-      case _ => TokenizerInternalException(error.description)
+      case ErrorCodes.unauthorized    => AuthorizationException(error.description)
+      case ErrorCodes.internal        => TokenizerInternalException(error.description)
+      case _                          => TokenizerInternalException(error.description)
     }
   }
 
   def translateException(e: Throwable): Error = {
     e match {
-      case e: UnauthorizedException => Error(ErrorCodes.unauthorized, e.getMessage)
-      case e: TokenizerInternalException => Error(ErrorCodes.internal, e.getMessage)
-      case e: Throwable => Error(ErrorCodes.internal, e.getMessage)
+      case _: AuthenticationException    => Error(ErrorCodes.unauthenticated, "invalid/expired access token")
+      case _: AuthorizationException     => Error(ErrorCodes.unauthorized, "unauthorized operation")
+      case _: TokenizerInternalException => Error(ErrorCodes.internal, e.getMessage)
+      case _: Throwable                  => Error(ErrorCodes.internal, e.getMessage)
     }
   }
 }

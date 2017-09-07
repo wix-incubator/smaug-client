@@ -19,10 +19,8 @@ import com.wix.restaurants.common.protocol.api.{Error, Response}
 class TokenizerDriver(port: Int) {
   private val probe = new EmbeddedHttpProbe(port, EmbeddedHttpProbe.NotFoundHandler)
   private val tokenizeRequestParser = new TokenizeRequestParser
-  private val tokenizeRequestParserNG = new TokenizeRequestParserNG
   private val responseForTokenizeRequestParser = new ResponseForTokenizeRequestParser
   private val inTransitRequestParser = new InTransitRequestParser
-  private val inTransitRequestParserNG = new InTransitRequestParserNG
   private val responseForInTransitRequestParser = new ResponseForInTransitRequestParser
 
   def start() {
@@ -41,18 +39,12 @@ class TokenizerDriver(port: Int) {
     new FormUrlCtx(params)
   }
 
-  def aTokenizeFor(request: TokenizeRequest): TokenizeCtx = {
+  def aTokenizeRequest(request: TokenizeRequest): TokenizeCtx = {
     new TokenizeCtx(request)
   }
-  def aTokenizeRequest(request: TokenizeRequestNG): TokenizeNGCtx = {
-    new TokenizeNGCtx(request)
-  }
 
-  def anInTransitFor(request: InTransitRequest): InTransitCtx = {
+  def anInTransitRequest(request: InTransitRequest): InTransitCtx = {
     new InTransitCtx(request)
-  }
-  def anInTransitRequest(request: InTransitRequestNG): InTransitNGCtx = {
-    new InTransitNGCtx(request)
   }
 
   abstract class Ctx(resource: String) {
@@ -105,22 +97,6 @@ class TokenizerDriver(port: Int) {
 
     protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
       val parsedRequest = tokenizeRequestParser.parse(entity.asString)
-      parsedRequest == request
-    }
-  }
-  class TokenizeNGCtx(request: TokenizeRequestNG) extends Ctx("/tokenizeNG") {
-    def returns(value: CreditCardToken): Unit = {
-      val response = Response[CreditCardToken](value = value)
-      returnsJson(responseForTokenizeRequestParser.stringify(response))
-    }
-
-    def errors(error: Error): Unit = {
-      val response = Response[CreditCardToken](error = error)
-      returnsJson(responseForTokenizeRequestParser.stringify(response))
-    }
-
-    protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
-      val parsedRequest = tokenizeRequestParserNG.parse(entity.asString)
 
       parsedRequest == request
     }
@@ -140,22 +116,6 @@ class TokenizerDriver(port: Int) {
 
     protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
       val parsedRequest = inTransitRequestParser.parse(entity.asString)
-      parsedRequest == request
-    }
-  }
-  class InTransitNGCtx(request: InTransitRequestNG) extends Ctx("/intransitNG") {
-    def returns(value: CreditCardToken): Unit = {
-      val response = Response[CreditCardToken](value = value)
-      returnsJson(responseForInTransitRequestParser.stringify(response))
-    }
-
-    def errors(error: Error): Unit = {
-      val response = Response[CreditCardToken](error = error)
-      returnsJson(responseForInTransitRequestParser.stringify(response))
-    }
-
-    protected override def isStubbedRequestEntity(entity: HttpEntity): Boolean = {
-      val parsedRequest = inTransitRequestParserNG.parse(entity.asString)
       parsedRequest == request
     }
   }

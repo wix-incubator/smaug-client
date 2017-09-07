@@ -35,15 +35,11 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     token = "some permanent token",
     creditCard = PublicCreditCard(someCard))
 
-  val aTokenizeRequest = TokenizeRequest(card = someCard)
-  val aTokenizeRequestNG: String => TokenizeRequestNG = tenantId => TokenizeRequestNG(someCard, tenantId)
+  val aTokenizeRequest: String => TokenizeRequest = tenantId => TokenizeRequest(someCard, tenantId)
   val someAdditionalCardInfo = Some(CreditCardOptionalFields.withFields(
     csc = Some("123")
   ))
-  val anInTransitRequest = InTransitRequest(
-    permanentToken = somePermanentCardToken,
-    additionalInfo = someAdditionalCardInfo)
-  val anInTransitRequestNG: String => InTransitRequestNG = tenantId => InTransitRequestNG(
+  val anInTransitRequest: String => InTransitRequest = tenantId => InTransitRequest(
     permanentToken = somePermanentCardToken,
     additionalInfo = someAdditionalCardInfo,
     tenantId = tenantId)
@@ -98,64 +94,26 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
 
   "tokenizing a card" should {
     "return an in-transit card token on success" in new Ctx {
-      driver.aTokenizeFor(aTokenizeRequest) returns someInTransitToken
+      driver.aTokenizeRequest(aTokenizeRequest(someTenantId)) returns someInTransitToken
 
-      cardsStoreBridge.tokenize(
-        card = someCard
-      ) must be_===(Success(someInTransitToken))
+      cardsStoreBridge.tokenize(card = someCard, tenantId = someTenantId) must be_===(Success(someInTransitToken))
     }
 
     "gracefully fail on error" in new Ctx {
       val someErrorMessage = "some error message"
-      driver.aTokenizeFor(aTokenizeRequest) errors anInternalError(someErrorMessage)
+      driver.aTokenizeRequest(aTokenizeRequest(someTenantId)) errors anInternalError(someErrorMessage)
 
-      cardsStoreBridge.tokenize(
-        card = someCard
-      ) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
-    }
-  }
-  "tokenizing a card NG" should {
-    "return an in-transit card token on success" in new Ctx {
-      driver.aTokenizeRequest(aTokenizeRequestNG(someTenantId)) returns someInTransitToken
-
-      cardsStoreBridge.tokenizeNG(card = someCard, tenantId = someTenantId) must be_===(Success(someInTransitToken))
-    }
-
-    "gracefully fail on error" in new Ctx {
-      val someErrorMessage = "some error message"
-      driver.aTokenizeRequest(aTokenizeRequestNG(someTenantId)) errors anInternalError(someErrorMessage)
-
-      cardsStoreBridge.tokenizeNG(card = someCard, tenantId = someTenantId) must be_===(Failure(
+      cardsStoreBridge.tokenize(card = someCard, tenantId = someTenantId) must be_===(Failure(
         TokenizerInternalException(someErrorMessage)))
     }
   }
 
+
   "converting a permanent card token" should {
     "return an in-transit card token on success" in new Ctx {
-      driver.anInTransitFor(anInTransitRequest) returns someInTransitToken
+      driver.anInTransitRequest(anInTransitRequest(someTenantId)) returns someInTransitToken
 
       cardsStoreBridge.inTransit(
-        permanentToken = somePermanentCardToken,
-        additionalInfo = someAdditionalCardInfo
-      ) must be_===(Success(someInTransitToken))
-    }
-
-    "gracefully fail on error" in new Ctx {
-      val someErrorMessage = "some error message"
-
-      driver.anInTransitFor(anInTransitRequest) errors anInternalError(someErrorMessage)
-
-      cardsStoreBridge.inTransit(
-        permanentToken = somePermanentCardToken,
-        additionalInfo = someAdditionalCardInfo
-      ) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
-    }
-  }
-  "converting a permanent card token NG" should {
-    "return an in-transit card token on success" in new Ctx {
-      driver.anInTransitRequest(anInTransitRequestNG(someTenantId)) returns someInTransitToken
-
-      cardsStoreBridge.inTransitNG(
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo,
         tenantId = someTenantId) must be_===(Success(someInTransitToken))
@@ -164,9 +122,9 @@ class DefaultTokenizerClientTest extends SpecWithJUnit {
     "gracefully fail on error" in new Ctx {
       val someErrorMessage = "some error message"
 
-      driver.anInTransitRequest(anInTransitRequestNG(someTenantId)) errors anInternalError(someErrorMessage)
+      driver.anInTransitRequest(anInTransitRequest(someTenantId)) errors anInternalError(someErrorMessage)
 
-      cardsStoreBridge.inTransitNG(
+      cardsStoreBridge.inTransit(
         permanentToken = somePermanentCardToken,
         additionalInfo = someAdditionalCardInfo,
         tenantId = someTenantId) must be_===(Failure(TokenizerInternalException(someErrorMessage)))
