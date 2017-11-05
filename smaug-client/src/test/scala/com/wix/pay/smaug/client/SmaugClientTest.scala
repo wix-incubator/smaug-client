@@ -18,7 +18,7 @@ import com.wix.pay.smaug.client.testkit.SmaugDriver
 import com.wix.restaurants.common.protocol.api.Error
 
 
-class SmaugTokenizerClientTest extends SpecWithJUnit {
+class SmaugClientTest extends SpecWithJUnit {
   val cardsStoreBridgePort = 10001
 
   val someAccessToken = "some access token"
