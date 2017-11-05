@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix.pay</groupId>
-    <artifactId>credit-card-tokenizer-client-all</artifactId>
+    <artifactId>smaug-client-all</artifactId>
     <version>1.7.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Credit Card Tokenizer Client</name>
-    <description>Credit Card Tokenizer Client modules pom</description>
-	<url>https://github.com/wix/credit-card-tokenizer-client</url>
+    <name>Smaug Client</name>
+    <description>Smaug Client Parent and Aggregator pom.</description>
+	<url>https://github.com/wix/smaug-client</url>
 
 
 	<parent>
@@ -45,9 +45,9 @@
 
 
 	<scm>
-		<url>https://github.com/wix/credit-card-tokenizer-client</url>
-		<connection>scm:git:git://github.com/wix/credit-card-tokenizer-client.git</connection>
-		<developerConnection>scm:git:git@github.com:wix/credit-card-tokenizer-client.git</developerConnection>
+		<url>https://github.com/wix/smaug-client</url>
+		<connection>scm:git:git://github.com/wix/smaug-client.git</connection>
+		<developerConnection>scm:git:git@github.com:wix/smaug-client.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -67,9 +67,9 @@
 
 
 	<modules>
-        <module>credit-card-tokenizer-api</module>
-		<module>credit-card-tokenizer-common</module>
-        <module>credit-card-tokenizer-client</module>
-        <module>credit-card-tokenizer-testkit</module>
+        <module>smaug-client-api</module>
+		<module>smaug-client-common</module>
+        <module>smaug-client</module>
+        <module>smaug-testkit</module>
     </modules>
 </project>
