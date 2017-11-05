@@ -43,7 +43,6 @@
 		</developer>
 	</developers>
 
-
 	<scm>
 		<url>https://github.com/wix/smaug-client</url>
 		<connection>scm:git:git://github.com/wix/smaug-client.git</connection>
