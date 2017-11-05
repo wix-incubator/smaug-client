@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>smaug-client-common</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Smaug Client Common</name>
     <description>Smaug Client Common</description>
@@ -36,7 +36,7 @@
     <parent>
         <groupId>com.wix.pay</groupId>
         <artifactId>smaug-client-all</artifactId>
-        <version>1.7.0</version>
+        <version>1.8.0-SNAPSHOT</version>
     </parent>
 
 
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.wix.pay</groupId>
             <artifactId>smaug-client-api</artifactId>
-            <version>1.7.0</version>
+            <version>1.8.0-SNAPSHOT</version>
         </dependency>
 		<dependency>
             <groupId>org.json4s</groupId>
