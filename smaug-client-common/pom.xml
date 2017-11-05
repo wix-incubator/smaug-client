@@ -43,7 +43,7 @@
     <dependencies>
         <dependency>
             <groupId>com.wix.pay</groupId>
-            <artifactId>smaug-api</artifactId>
+            <artifactId>smaug-client-api</artifactId>
             <version>1.7.0-SNAPSHOT</version>
         </dependency>
 		<dependency>
