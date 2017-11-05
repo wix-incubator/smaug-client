@@ -43,7 +43,7 @@
         <!-- Compile/runtime dependencies -->
         <dependency>
             <groupId>com.wix.pay</groupId>
-            <artifactId>smaug-common</artifactId>
+            <artifactId>smaug-client-common</artifactId>
             <version>1.7.0-SNAPSHOT</version>
         </dependency>
         <dependency>
