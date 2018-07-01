@@ -56,7 +56,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<com.wix.pay.creditcard.version>1.8.0-SNAPSHOT</com.wix.pay.creditcard.version>
+		<com.wix.pay.creditcard.version>1.8.0</com.wix.pay.creditcard.version>
 		<com.wix.restaurants.common.protocol.version>1.11.0-SNAPSHOT</com.wix.restaurants.common.protocol.version>
 		<com.wix.http-testkit.version>0.1.17</com.wix.http-testkit.version>
 		<com.google.http.client.version>1.21.0</com.google.http.client.version>
